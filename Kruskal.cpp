@@ -22,6 +22,9 @@ void link(map<int,Vertex> & graph,int v1,int v2,int aWeight){
   anEdge.source= &(graph[v1]);
   anEdge.destination= &(graph[v2]);
   graph[v1].adjacency.push_back(anEdge);
+  Vertex * aux=anEdge.source;
+  anEdge.source=anEdge.destination;
+  anEdge.destination=aux;
   graph[v2].adjacency.push_back(anEdge);
 }
 void addVertex(map<int,Vertex> & graph,int num){
@@ -38,36 +41,31 @@ public:
 };
 
 void Kruskal(map<int,Vertex> & graph,map<int,Vertex> & maxTree){
-  for (map<int,Vertex>::iterator algo=graph.begin();algo!=graph.end();++algo){
-     addVertex(maxTree,(*algo).second.dato);
+  for (map<int,Vertex>::iterator g=graph.begin();g!=graph.end();++g){
+     addVertex(maxTree,(*g).second.dato);
   }
-  priority_queue<Edge,vector<Edge>,CompareEdge > q; //ver el compare
+  priority_queue<Edge,vector<Edge>,CompareEdge > q; //lleno la min-heap
   for (map<int,Vertex>::iterator gr=graph.begin();gr!= graph.end();++gr){
     for (vector<Edge>::iterator ed=(*gr).second.adjacency.begin();ed!=(*gr).second.adjacency.end();++ed){
       q.push(*ed);
     }
   }
-  //llenemos la max-heap;
-  int pertenece[graph.size()];
-  for (int i=0;i<=graph.size();i++){
-    pertenece[i]=-1;
-  }
-  //inicializamos conjuntos virtuales en vacio
+  vector<int> pertenece(graph.size(),-1);//inicializamos conjuntos virtuales en vacio
   bool belong;
   int numEdges=1;
-  int source , destination;
+  int source , destination,i;
   while (numEdges < graph.size()){
     belong=false;
     Edge e=q.top();
     source= (*e.source).dato;
     destination= (*e.destination).dato;
-    int i=destination;
+    i=destination;
     while (pertenece[i]!=destination && pertenece[i]!=-1){
       if(pertenece[i]==source){belong=true;} 
       i=pertenece[i];
     }
     if (!belong){
-      if (pertenece[source]==-1 && pertenece[destination]==-1){
+      if (pertenece[source]==-1 && pertenece[destination]==-1){ //actualizo lista circular de conjuntos segun el caso que corresponda
          pertenece[source]=destination;
          pertenece[destination]=source;
       }
