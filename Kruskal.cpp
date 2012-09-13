@@ -22,10 +22,6 @@ void link(map<int,Vertex> & graph,int v1,int v2,int aWeight){
   anEdge.source= &(graph[v1]);
   anEdge.destination= &(graph[v2]);
   graph[v1].adjacency.push_back(anEdge);
-  Vertex * aux=anEdge.source;
-  anEdge.source=anEdge.destination;
-  anEdge.destination=aux;
-  graph[v2].adjacency.push_back(anEdge);
 }
 void addVertex(map<int,Vertex> & graph,int num){
   Vertex v;
@@ -41,16 +37,13 @@ public:
 };
 
 void Kruskal(map<int,Vertex> & graph,map<int,Vertex> & maxTree){
-  for (map<int,Vertex>::iterator g=graph.begin();g!=graph.end();++g){
-     addVertex(maxTree,(*g).second.dato);
-  }
-  priority_queue<Edge,vector<Edge>,CompareEdge > q; //lleno la min-heap
+  priority_queue<Edge,vector<Edge>,CompareEdge > q; //ver el compare
   for (map<int,Vertex>::iterator gr=graph.begin();gr!= graph.end();++gr){
     for (vector<Edge>::iterator ed=(*gr).second.adjacency.begin();ed!=(*gr).second.adjacency.end();++ed){
       q.push(*ed);
     }
   }
-  vector<int> pertenece(graph.size(),-1);//inicializamos conjuntos virtuales en vacio
+  vector<int> pertenece(graph.size()+1,-1);//inicializamos conjuntos virtuales en vacio
   bool belong;
   int numEdges=1;
   int source , destination,i;
@@ -65,7 +58,7 @@ void Kruskal(map<int,Vertex> & graph,map<int,Vertex> & maxTree){
       i=pertenece[i];
     }
     if (!belong){
-      if (pertenece[source]==-1 && pertenece[destination]==-1){ //actualizo lista circular de conjuntos segun el caso que corresponda
+      if (pertenece[source]==-1 && pertenece[destination]==-1){
          pertenece[source]=destination;
          pertenece[destination]=source;
       }
@@ -87,6 +80,7 @@ void Kruskal(map<int,Vertex> & graph,map<int,Vertex> & maxTree){
         }
       }
       link(maxTree,source,destination,e.weight);//agrego arista al grafo
+      link(maxTree,destination,source,e.weight);
       numEdges++;
     }
     q.pop();
@@ -103,15 +97,25 @@ int main(){
   addVertex(graph,5);
   addVertex(graph,6);
   link(graph,1,2,10);
+  link(graph,2,1,10);
   link(graph,1,4,30);
+  link(graph,4,1,30);
   link(graph,1,5,45);
+  link(graph,5,1,45);
   link(graph,2,3,50);
+  link(graph,3,2,50);
   link(graph,2,5,40);
+  link(graph,5,2,40);
   link(graph,2,6,25);
+  link(graph,6,2,25);
   link(graph,3,5,35);
+  link(graph,5,3,35);
+  link(graph,3,6,15);
   link(graph,3,6,15); 
   link(graph,4,6,20);
+  link(graph,6,4,20);
   link(graph,5,6,55);
+  link(graph,6,5,55);
   Kruskal(graph,maxTree);
   return 0;
 }
